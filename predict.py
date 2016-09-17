@@ -1,11 +1,9 @@
 import pandas as pd
 import sys
-import random
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.grid_search import GridSearchCV
+from sklearn.naive_bayes import GaussianNB
 from datetime import datetime
-from sklearn.metrics import accuracy_score
 import numpy as np
 
 
@@ -14,8 +12,8 @@ def main():
     start = datetime.now()
     print start
 
-    sub_train = pd.read_csv('data/sub_train.csv')
-    validate = pd.read_csv('data/validate.csv')
+    sub_train = pd.read_csv(sys.argv[1])
+    validate = pd.read_csv(sys.argv[2])
 
     # target is 'booking_bool'
     # train features
@@ -35,67 +33,65 @@ def main():
     y_test = np.ravel(y_test.values)
 
     print 'Learning Stage:'
-    print 'Decision Tree'
-    param_grid = {'max_depth': [3, 5, 10, None], 'min_samples_split': [2, 3, 4, 5], 'random_state': [4321]}
 
-    # clf0 = GridSearchCV(DecisionTreeClassifier(), param_grid)
-    clf0 = DecisionTreeClassifier(min_samples_split=5, max_depth=None, random_state=4321)
+    print 'Random Forest'
+
+    clf0 = RandomForestClassifier(n_estimators=100, random_state=4321)
     clf0.fit(X_train, y_train)
-    prediction0_on_train = clf0.predict(X_train)
-    prediction0_on_test = clf0.predict(X_test)
+    prediction0_on_train = clf0.predict_proba(X_train)
+    prediction0_on_train = pd.DataFrame().append(sub_train[['srch_id', 'prop_id']],
+                                                 ignore_index=True).join(pd.DataFrame(prediction0_on_train[:,1],
+                                                                                      columns=['prediction']))
+    prediction0_on_train.sort_values(by=['srch_id', 'prediction'], inplace=True, ascending=[True,False])
+    prediction0_on_train.to_csv(sys.argv[3], index=False)
+
+
+    prediction0_on_test = clf0.predict_proba(X_test)
+    prediction0_on_test = pd.DataFrame().append(validate[['srch_id', 'prop_id']],
+                                                ignore_index=True).join(pd.DataFrame(prediction0_on_test[:,1],
+                                                                                     columns=['prediction']))
+    prediction0_on_test.sort_values(by=['srch_id', 'prediction'], inplace=True, ascending=[True, False])
+    prediction0_on_test.to_csv(sys.argv[4], index=False)
 
     print 'Logistic Regression'
-    clf1 = LogisticRegression(solver='liblinear', n_jobs=-1)
+    clf1 = LogisticRegression(solver='liblinear', random_state=4321)
     clf1.fit(X_train, y_train)
-    prediction1_on_train = clf1.predict(X_train)
-    prediction1_on_test = clf1.predict(X_test)
+    prediction1_on_train = clf1.predict_proba(X_train)
+    prediction1_on_train = pd.DataFrame().append(sub_train[['srch_id', 'prop_id']],
+                                                 ignore_index=True).join(pd.DataFrame(prediction1_on_train[:, 1],
+                                                                                      columns=['prediction']))
+    prediction1_on_train.sort_values(by=['srch_id', 'prediction'], inplace=True, ascending=[True, False])
+    prediction1_on_train.to_csv(sys.argv[5], index=False)
 
-    # print 'feature importances:'
-    # print 'decision tree: ', clf0.feature_importances_
+    prediction1_on_test = clf1.predict_proba(X_test)
+    prediction1_on_test = pd.DataFrame().append(validate[['srch_id', 'prop_id']],
+                                                ignore_index=True).join(pd.DataFrame(prediction1_on_test[:, 1],
+                                                                                     columns=['prediction']))
+    prediction1_on_test.sort_values(by=['srch_id', 'prediction'], inplace=True, ascending=[True, False])
+    prediction1_on_test.to_csv(sys.argv[6], index=False)
 
-    print 'Quality Stage:'
+    print 'Naive Bayes'
+    clf2 = GaussianNB()
+    clf2.fit(X_train, y_train)
+    prediction2_on_train = clf2.predict_proba(X_train)
+    prediction2_on_train = pd.DataFrame().append(sub_train[['srch_id', 'prop_id']],
+                                                 ignore_index=True).join(pd.DataFrame(prediction2_on_train[:, 1],
+                                                                                      columns=['prediction']))
+    prediction2_on_train.sort_values(by=['srch_id', 'prediction'], inplace=True, ascending=[True, False])
+    prediction2_on_train.to_csv(sys.argv[7], index=False)
 
-
-    # simple benchmark
-    w0 = np.ones(len(y_train))
-    for idx, i in enumerate(np.bincount(y_train)):
-        if idx == 0:
-            w0[y_train == idx] = 1.0 / 0.972260230118
-        else:
-            w0[y_train == idx] = 1.0 / (1 - 0.972260230118)
-
-    w1 = np.ones(len(y_test))
-    for idx, i in enumerate(np.bincount(y_test)):
-        if idx == 0:
-            w1[y_test == idx] = 1.0 / 0.972053497245
-        else:
-            w1[y_test == idx] = 1.0 / (1 - 0.972053497245)
-
-    train_bench = np.zeros((len(y_train),), dtype=np.int)
-    test_bench = np.zeros((len(y_test),), dtype=np.int)
-    print 'benchmark (all zeros) score on train: ', accuracy_score(y_train, train_bench, sample_weight=w0)
-    print 'benchmark (all zeros) score on test: ', accuracy_score(y_test, test_bench, sample_weight=w1)
-
-
-    print 'Decision Tree'
-    accuracy0_on_sub_train = accuracy_score(y_train, prediction0_on_train, sample_weight=w0)
-    print 'subtrain accuracy score: ', accuracy0_on_sub_train
-
-    accuracy0_on_sub_test = accuracy_score(y_test, prediction0_on_test, sample_weight=w1)
-    print 'subtest accuracy score: ', accuracy0_on_sub_test
-
-
-    print 'Logistic Regression'
-    accuracy1_on_sub_train = accuracy_score(y_train, prediction1_on_train, sample_weight=w0)
-    print 'subtrain accuracy score: ', accuracy1_on_sub_train
-
-    accuracy1_on_sub_test = accuracy_score(y_test, prediction1_on_test, sample_weight=w1)
-    print 'subtest accuracy score: ', accuracy1_on_sub_test
-
+    prediction2_on_test = clf2.predict_proba(X_test)
+    prediction2_on_test = pd.DataFrame().append(validate[['srch_id', 'prop_id']],
+                                                ignore_index=True).join(pd.DataFrame(prediction2_on_test[:, 1],
+                                                                                     columns=['prediction']))
+    prediction2_on_test.sort_values(by=['srch_id', 'prediction'], inplace=True, ascending=[True, False])
+    prediction2_on_test.to_csv(sys.argv[8], index=False)
 
     time = datetime.now() - start
-    print 'total processing time: %d' % int(time.seconds)
+    print 'total processing time: %d seconds' % int(time.seconds)
 
 
 if __name__ == '__main__':
     main()
+
+
