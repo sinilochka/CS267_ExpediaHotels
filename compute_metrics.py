@@ -69,7 +69,8 @@ def main():
             ndcgs.append(ndcg)
     final_ndcg = 1.0 * sum(ndcgs) / len(ndcgs)
 
-    print final_ndcg
+    print "Evaluation Stage"
+    print "NDCG score:", final_ndcg
 
     time = datetime.now() - start
     print 'total processing time: %d seconds' % int(time.seconds)
