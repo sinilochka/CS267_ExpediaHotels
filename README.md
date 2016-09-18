@@ -1,6 +1,7 @@
 CS267_ExpediaHotels
 
 ML Pipeline:
+
 Step 1. Sub-sample data from train.csv.
 1 experiment: 10% subtrain, 5% validate
 2 experiment: 20% subtrain, 10% validate
