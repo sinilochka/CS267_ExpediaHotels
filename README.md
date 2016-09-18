@@ -1,6 +1,8 @@
 CS267_ExpediaHotels
 
+
 ML Pipeline:
+
 
 Step 1. Sub-sample data from train.csv.
 
@@ -11,12 +13,14 @@ Step 1. Sub-sample data from train.csv.
 available here:
 https://github.com/sinilochka/CS267_ExpediaHotels/blob/master/generate_features.py
 
+
 Step 2. Extract target from files obtained in Step 1.
 
 Allows for easy computation in Step 4.
 
 available here:
 https://github.com/sinilochka/CS267_ExpediaHotels/blob/master/target_extract.py
+
 
 Step 3. Learning stage.
 
@@ -30,7 +34,7 @@ Logistic Regression:
     1) solver = ’sag'
     2) solver = ‘liblinear'
     
-Naive Bayes
+Gaussian Naive Bayes
 
 Random Forest:
     1) n = 50
@@ -38,6 +42,7 @@ Random Forest:
     
 available here:
 https://github.com/sinilochka/CS267_ExpediaHotels/blob/master/predict.py
+
 
 Step 4. Evaluation stage.
 
