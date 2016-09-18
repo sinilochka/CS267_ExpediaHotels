@@ -36,7 +36,7 @@ def main():
 
     print 'Random Forest'
 
-    clf0 = RandomForestClassifier(n_estimators=100, random_state=4321)
+    clf0 = RandomForestClassifier(n_estimators=50, random_state=4321)
     clf0.fit(X_train, y_train)
     prediction0_on_train = clf0.predict_proba(X_train)
     prediction0_on_train = pd.DataFrame().append(sub_train[['srch_id', 'prop_id']],
@@ -54,7 +54,7 @@ def main():
     prediction0_on_test.to_csv(sys.argv[4], index=False)
 
     print 'Logistic Regression'
-    clf1 = LogisticRegression(solver='liblinear', random_state=4321)
+    clf1 = LogisticRegression(solver='sag', random_state=4321)
     clf1.fit(X_train, y_train)
     prediction1_on_train = clf1.predict_proba(X_train)
     prediction1_on_train = pd.DataFrame().append(sub_train[['srch_id', 'prop_id']],
@@ -70,22 +70,22 @@ def main():
     prediction1_on_test.sort_values(by=['srch_id', 'prediction'], inplace=True, ascending=[True, False])
     prediction1_on_test.to_csv(sys.argv[6], index=False)
 
-    print 'Naive Bayes'
-    clf2 = GaussianNB()
-    clf2.fit(X_train, y_train)
-    prediction2_on_train = clf2.predict_proba(X_train)
-    prediction2_on_train = pd.DataFrame().append(sub_train[['srch_id', 'prop_id']],
-                                                 ignore_index=True).join(pd.DataFrame(prediction2_on_train[:, 1],
-                                                                                      columns=['prediction']))
-    prediction2_on_train.sort_values(by=['srch_id', 'prediction'], inplace=True, ascending=[True, False])
-    prediction2_on_train.to_csv(sys.argv[7], index=False)
-
-    prediction2_on_test = clf2.predict_proba(X_test)
-    prediction2_on_test = pd.DataFrame().append(validate[['srch_id', 'prop_id']],
-                                                ignore_index=True).join(pd.DataFrame(prediction2_on_test[:, 1],
-                                                                                     columns=['prediction']))
-    prediction2_on_test.sort_values(by=['srch_id', 'prediction'], inplace=True, ascending=[True, False])
-    prediction2_on_test.to_csv(sys.argv[8], index=False)
+    # print 'Naive Bayes'
+    # clf2 = GaussianNB()
+    # clf2.fit(X_train, y_train)
+    # prediction2_on_train = clf2.predict_proba(X_train)
+    # prediction2_on_train = pd.DataFrame().append(sub_train[['srch_id', 'prop_id']],
+    #                                              ignore_index=True).join(pd.DataFrame(prediction2_on_train[:, 1],
+    #                                                                                   columns=['prediction']))
+    # prediction2_on_train.sort_values(by=['srch_id', 'prediction'], inplace=True, ascending=[True, False])
+    # prediction2_on_train.to_csv(sys.argv[7], index=False)
+    #
+    # prediction2_on_test = clf2.predict_proba(X_test)
+    # prediction2_on_test = pd.DataFrame().append(validate[['srch_id', 'prop_id']],
+    #                                             ignore_index=True).join(pd.DataFrame(prediction2_on_test[:, 1],
+    #                                                                                  columns=['prediction']))
+    # prediction2_on_test.sort_values(by=['srch_id', 'prediction'], inplace=True, ascending=[True, False])
+    # prediction2_on_test.to_csv(sys.argv[8], index=False)
 
     time = datetime.now() - start
     print 'total processing time: %d seconds' % int(time.seconds)

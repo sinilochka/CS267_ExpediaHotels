@@ -1,8 +1,6 @@
 import sys
 import math
-import pandas as pd
 from datetime import datetime
-import numpy as np
 
 
 def calc_dcg(results):
@@ -39,9 +37,8 @@ def main():
             prediction = float(s[2])
             if srch_id_pred not in samples:
                 samples[srch_id_pred] = dict()
-
             samples[srch_id_pred][prop_id_pred] = {
-                'prediction': prediction,
+                'prediction': prediction
             }
         except:
             pass
@@ -61,6 +58,7 @@ def main():
                     samples[srch_id][prop_id]['relevance'] = 5.0
         except:
             pass
+
 
     ndcgs = []
     for search_id, search_results in samples.iteritems():

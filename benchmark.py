@@ -3,7 +3,9 @@ import numpy as np
 import random
 import sys
 
+
 random.seed(4321)
+
 
 
 def main():
